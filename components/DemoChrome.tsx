@@ -11,7 +11,7 @@ import {
 import type { PersonaId } from "@/lib/types";
 
 // Floating demo controls + guided script checklist, shown on all mockup pages.
-export default function DemoChrome({ current }: { current: "web" | "app" | "call" | "oneview" }) {
+export default function DemoChrome({ current, bare }: { current: "web" | "app" | "call" | "oneview"; bare?: boolean }) {
   const [persona, setPersona] = useActivePersona();
   const events = useEvents();
   const [open, setOpen] = useState(false);
@@ -23,6 +23,7 @@ export default function DemoChrome({ current }: { current: "web" | "app" | "call
   return (
     <>
       {/* top-right control bar */}
+      {!bare && (
       <div className="fixed top-3 right-3 z-50 flex items-center gap-2 bg-amex-deep/90 text-white rounded-full pl-3 pr-2 py-1.5 shadow-lg backdrop-blur text-xs">
         <span className="opacity-70 hidden sm:inline">🎬</span>
         <select
@@ -61,6 +62,7 @@ export default function DemoChrome({ current }: { current: "web" | "app" | "call
           ↺
         </button>
       </div>
+      )}
 
       {/* bottom-left script checklist */}
       <div className="fixed bottom-3 left-3 z-50 w-80 max-w-[85vw] bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden text-sm">

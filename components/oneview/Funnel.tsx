@@ -1,7 +1,7 @@
 "use client";
 
 import { funnelCounts } from "@/lib/analytics";
-import { PERSONAS } from "@/lib/personas";
+import { getPersonaMeta } from "@/lib/personas";
 import { EmptyState } from "./Timeline";
 
 export default function Funnel({ events }: { events: Parameters<typeof funnelCounts>[0] }) {
@@ -37,7 +37,8 @@ export default function Funnel({ events }: { events: Parameters<typeof funnelCou
                 <span className="absolute inset-0 flex items-center px-3 text-xs font-bold text-amex-dark">
                   {r.count} persona{r.count !== 1 ? "s" : ""} · {pct}%
                   <span className="ml-2 font-normal text-gray-400">
-                    ({r.personas.map((p) => PERSONAS[p].name.split(" ")[0]).join(", ")})
+                    ({r.personas.slice(0, 3).map((p) => getPersonaMeta(p).name.split(" ")[0]).join(", ")}
+                    {r.personas.length > 3 ? ` +${r.personas.length - 3} more` : ""})
                   </span>
                 </span>
               </div>

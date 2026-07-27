@@ -11,7 +11,7 @@
   --color-ch-app: #16a34a;
   --color-ch-voice: #f59e0b;
   --color-ch-inperson: #8b5cf6;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
@@ -77,4 +77,34 @@ body {
 }
 .pop-in {
   animation: popIn 0.3s ease both;
+}
+
+@keyframes growX {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.grow-x {
+  animation: growX 0.55s ease both;
+  transform-origin: left center;
+}
+
+@keyframes heroFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.hero-float {
+  animation: heroFloat 7s ease-in-out infinite;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
 }

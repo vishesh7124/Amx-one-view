@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
 
 export const metadata: Metadata = {
-  title: "Amex One View — Cross-Channel Journey Stitching Prototype",
+  title: "Amex One View — One Customer. One Identity. One Continuous Journey.",
   description:
-    "Prototype: One Customer. One Identity. One Continuous Journey. — Code Street Hackathon",
+    "Cross-channel identity resolution and journey stitching, on the American Express theme.",
 };
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${manrope.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>

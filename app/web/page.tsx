@@ -42,7 +42,7 @@ const CARD_IDS: Record<PersonaId, string> = {
 type View = "cards" | "travel" | "rewards" | "business" | "help";
 
 export default function WebMockup() {
-  const [persona] = useActivePersona();
+  const [persona, setActivePersona] = useActivePersona();
   const events = useEvents();
   const meta = PERSONAS[persona];
   const sessionId = useRef(uid("sess"));
@@ -61,7 +61,7 @@ export default function WebMockup() {
 
   // navigation + login + insurance state
   const [view, setView] = useState<View>("cards");
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedInAs, setLoggedInAs] = useState<PersonaId | null>(null);
   const [loginOpen, setLoginOpen] = useState(false);
   const [pendingIns, setPendingIns] = useState(false);
   const [insOpen, setInsOpen] = useState(false);
@@ -71,6 +71,7 @@ export default function WebMockup() {
 
   const submittedAppId = events.find((e) => e.type === "apply_submit" && e.persona === persona)?.ids.applicationId;
 
+  const loggedIn = loggedInAs === persona;
   const loginIds = loggedIn
     ? persona === "aarav"
       ? { email: meta.email, phone: meta.phone, ...(submittedAppId ? { applicationId: submittedAppId } : {}) }
@@ -193,17 +194,36 @@ export default function WebMockup() {
 
   // ─── login ───
   const doLogin = (p: PersonaId) => {
-    setLoggedIn(true);
-    setLoginOpen(false);
-    emit("web_login", "service", `Logged in to americanexpress.com — identity anchored (conf 1.00)`, {
-      ids:
-        p === "aarav"
-          ? { anonId: meta.anonId, deviceId: meta.deviceWeb, sessionId: sessionId.current, email: meta.email, phone: meta.phone, ...(submittedAppId ? { applicationId: submittedAppId } : {}) }
-          : { anonId: meta.anonId, deviceId: meta.deviceWeb, sessionId: sessionId.current, email: meta.email, phone: meta.phone, customerId: `cust-${p}`, cardId: CARD_IDS[p] },
+    const m = PERSONAS[p];
+    const pAppId = events.find((e) => e.type === "apply_submit" && e.persona === p)?.ids.applicationId;
+    const ids =
+      p === "aarav"
+        ? { anonId: m.anonId, deviceId: m.deviceWeb, sessionId: sessionId.current, email: m.email, phone: m.phone, ...(pAppId ? { applicationId: pAppId } : {}) }
+        : { anonId: m.anonId, deviceId: m.deviceWeb, sessionId: sessionId.current, email: m.email, phone: m.phone, customerId: `cust-${p}`, cardId: CARD_IDS[p] };
+    appendEvent({
+      persona: p,
+      channel: "web",
+      type: "web_login",
+      stage: "service",
+      label: "Logged in to americanexpress.com — identity anchored (conf 1.00)",
+      detail: "Web login = deterministic identity anchor on the web channel.",
+      ids,
     });
+    setLoggedInAs(p);
+    setLoginOpen(false);
+    if (p !== persona) setActivePersona(p);
     if (pendingIns) {
       setPendingIns(false);
-      openInsurance();
+      setInsOpen(true);
+      appendEvent({
+        persona: p,
+        channel: "web",
+        type: "booking_start",
+        stage: "transact",
+        label: "Started Travel Insurance quote — destination, dates, travelers",
+        detail: "Logged-in booking on the website.",
+        ids,
+      });
     }
   };
 
@@ -289,7 +309,7 @@ export default function WebMockup() {
           {loggedIn ? (
             <span className="px-3 py-1.5 rounded-full bg-amex-sky text-amex-dark font-semibold flex items-center gap-2">
               👤 {meta.name.split(" ")[0]}
-              <button onClick={() => setLoggedIn(false)} className="text-amex-dark/60 hover:text-amex-dark" title="Log out">
+              <button onClick={() => setLoggedInAs(null)} className="text-amex-dark/60 hover:text-amex-dark" title="Log out">
                 ⎋
               </button>
             </span>
@@ -493,7 +513,7 @@ export default function WebMockup() {
           <div className="mt-4 space-y-2">
             {(Object.keys(PERSONAS) as PersonaId[]).map((p) => {
               const m = PERSONAS[p];
-              const enabled = p !== "aarav" || !!submittedAppId;
+              const enabled = p !== "aarav" || events.some((e) => e.type === "apply_submit" && e.persona === p);
               const active = p === persona;
               return (
                 <button
@@ -510,7 +530,7 @@ export default function WebMockup() {
               );
             })}
           </div>
-          <p className="text-[11px] text-gray-400 mt-3">🎬 Log in as the active persona (set in the 🎬 bar). Web login = deterministic identity anchor.</p>
+          <p className="text-[11px] text-gray-400 mt-3">🎬 Clicking a profile logs in as that person (and switches the demo actor). Web login = deterministic identity anchor.</p>
         </Modal>
       )}
 
