@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { SCRIPTS, PERSONAS, TAB_ROUTES, TAB_LABELS } from "@/lib/personas";
+import TourGuide from "@/components/TourGuide";
 import {
   useActivePersona,
   useEvents,
@@ -66,15 +67,21 @@ export default function DemoChrome({ current, bare }: { current: "web" | "app" |
 
       {/* bottom-left script checklist */}
       <div className="fixed bottom-3 left-3 z-50 w-80 max-w-[85vw] bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden text-sm">
-        <button
-          onClick={() => setOpen(!open)}
-          className="w-full flex items-center justify-between px-3 py-2 bg-amex-dark text-white text-xs font-semibold"
-        >
-          <span>
+        <div className="flex items-center bg-amex-dark text-white text-xs font-semibold">
+          <button onClick={() => setOpen(!open)} className="flex-1 text-left px-3 py-2">
             🎬 Script — {PERSONAS[persona].name} · {done}/{steps.length} steps
-          </span>
-          <span>{open ? "▾" : "▴"}</span>
-        </button>
+          </button>
+          <button
+            onClick={() => window.dispatchEvent(new Event("amex:tour-restart"))}
+            title="Restart guided tour"
+            className="px-2.5 py-2 hover:bg-white/15 font-bold"
+          >
+            ▶ tour
+          </button>
+          <button onClick={() => setOpen(!open)} className="px-2.5 py-2 hover:bg-white/15">
+            {open ? "▾" : "▴"}
+          </button>
+        </div>
         {open && (
           <ol className="max-h-56 overflow-y-auto scrollbar-thin p-2 space-y-1">
             {steps.map((s) => {
@@ -108,6 +115,9 @@ export default function DemoChrome({ current, bare }: { current: "web" | "app" |
           </ol>
         )}
       </div>
+
+      {/* guided tour overlay (spotlight + auto-advance) */}
+      <TourGuide current={current} />
     </>
   );
 }

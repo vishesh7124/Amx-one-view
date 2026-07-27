@@ -79,6 +79,8 @@ export interface ScriptStep {
   id: string;
   tab: "web" | "app" | "call" | "oneview";
   label: string;
+  hint: string; // guided-tour instruction (imperative, judge-friendly)
+  targets?: string[]; // data-tour selectors, first found in DOM wins
   match: (e: JourneyEvent) => boolean;
 }
 
@@ -89,34 +91,34 @@ const isType =
 
 export const SCRIPTS: Record<PersonaId, ScriptStep[]> = {
   aarav: [
-    { id: "a1", tab: "web", label: "Land on amex.com — browse anonymously", match: isType("aarav", "page_view") },
-    { id: "a2", tab: "web", label: "View Platinum Travel Card details", match: isType("aarav", "card_view") },
-    { id: "a3", tab: "web", label: "Compare cards", match: isType("aarav", "compare_view") },
-    { id: "a4", tab: "web", label: "Start application (Platinum Travel)", match: isType("aarav", "apply_start") },
-    { id: "a5", tab: "web", label: "💥 ABANDON at KYC step — journey 'breaks'", match: isType("aarav", "apply_abandon") },
-    { id: "a6", tab: "oneview", label: "One View: drop-off alert → auto save-resume link (Tier 1)", match: isType("aarav", "action_resume_link") },
-    { id: "a7", tab: "call", label: "Call the number on the website (DNI) — ask about fees", match: isType("aarav", "call_start") },
-    { id: "a8", tab: "web", label: "Open resume link from email → prefilled form", match: isType("aarav", "resume_open") },
-    { id: "a9", tab: "web", label: "Submit application → application ID", match: isType("aarav", "apply_submit") },
-    { id: "a10", tab: "app", label: "Install app & log in", match: isType("aarav", "app_login") },
-    { id: "a11", tab: "app", label: "⭐ Activate card in app — the golden stitch (1.0)", match: isType("aarav", "card_activation") },
-    { id: "a12", tab: "app", label: "First in-store purchase (POS, closed loop)", match: isType("aarav", "pos_purchase") },
+    { id: "a1", tab: "web", label: "Land on amex.com — browse anonymously", hint: "You're browsing anonymously — AmEx can't see you, but One View just created a Provisional Identity. Tour auto-advances…", match: isType("aarav", "page_view") },
+    { id: "a2", tab: "web", label: "View Platinum Travel Card details", hint: "Open a card's details", targets: ["view-details"], match: isType("aarav", "card_view") },
+    { id: "a3", tab: "web", label: "Compare cards", hint: "Add a second card to compare", targets: ["compare-btn"], match: isType("aarav", "compare_view") },
+    { id: "a4", tab: "web", label: "Start application (Platinum Travel)", hint: "Start the application", targets: ["apply-now"], match: isType("aarav", "apply_start") },
+    { id: "a5", tab: "web", label: "💥 ABANDON at KYC step — journey 'breaks'", hint: "Abandon at the KYC step — this is where the journey breaks (the button highlights when it appears)", targets: ["apply-leave"], match: isType("aarav", "apply_abandon") },
+    { id: "a6", tab: "oneview", label: "One View: drop-off alert → auto save-resume link (Tier 1)", hint: "No clicks needed — watch One View: the Tier-1 agent sends the save-resume link by itself", match: isType("aarav", "action_resume_link") },
+    { id: "a7", tab: "call", label: "Call the number on the website (DNI) — ask about fees", hint: "Call the number on the site — the floating phone button", targets: ["call-launcher", "call-panel"], match: isType("aarav", "call_start") },
+    { id: "a8", tab: "web", label: "Open resume link from email → prefilled form", hint: "Open the resume email — your progress is restored", targets: ["resume-toast"], match: isType("aarav", "resume_open") },
+    { id: "a9", tab: "web", label: "Submit application → application ID", hint: "Submit the application", targets: ["apply-submit"], match: isType("aarav", "apply_submit") },
+    { id: "a10", tab: "app", label: "Install app & log in", hint: "Log in to the Amex app", targets: ["app-login"], match: isType("aarav", "app_login") },
+    { id: "a11", tab: "app", label: "⭐ Activate card in app — the golden stitch (1.0)", hint: "Activate the card — the golden stitch (confidence 1.00)", targets: ["activate-card"], match: isType("aarav", "card_activation") },
+    { id: "a12", tab: "app", label: "First in-store purchase (POS, closed loop)", hint: "Make the first in-store purchase — POS data is natively AmEx's (closed loop)", targets: ["pos-purchase"], match: isType("aarav", "pos_purchase") },
   ],
   meera: [
-    { id: "m1", tab: "web", label: "Log in to americanexpress.com", match: isType("meera", "web_login") },
-    { id: "m2", tab: "web", label: "Travel → Travel Insurance — start a quote", match: isType("meera", "booking_start") },
-    { id: "m3", tab: "web", label: "💥 Unknown error — booking fails (ERR-5003)", match: isType("meera", "booking_error") },
-    { id: "m4", tab: "app", label: "Switch to the mobile app → log in", match: isType("meera", "app_login") },
-    { id: "m5", tab: "app", label: "Book the SAME insurance in app — ✅ success", match: isType("meera", "booking_success") },
-    { id: "m6", tab: "oneview", label: "One View: 🔀 channel-failover alert → goodwill (Tier 1)", match: isType("meera", "action_goodwill") },
-    { id: "m7", tab: "oneview", label: "👥 Simulate 40 users → 🐞 platform-bug alert → file incident (Tier 2)", match: (e) => e.type === "action_file_incident" },
+    { id: "m1", tab: "web", label: "Log in to americanexpress.com", hint: "Log in to the website", targets: ["nav-login"], match: isType("meera", "web_login") },
+    { id: "m2", tab: "web", label: "Travel → Travel Insurance — start a quote", hint: "Open Travel → Travel Insurance and start a quote", targets: ["insurance-tile", "nav-travel"], match: isType("meera", "booking_start") },
+    { id: "m3", tab: "web", label: "💥 Unknown error — booking fails (ERR-5003)", hint: "Submit the quote — it fails with an unknown error (ERR-5003)", targets: ["ins-submit"], match: isType("meera", "booking_error") },
+    { id: "m4", tab: "app", label: "Switch to the mobile app → log in", hint: "Switch to the mobile app and log in", targets: ["app-login"], match: isType("meera", "app_login") },
+    { id: "m5", tab: "app", label: "Book the SAME insurance in app — ✅ success", hint: "Book the same insurance in the app — it just works", targets: ["app-ins-buy", "app-insurance-tile"], match: isType("meera", "booking_success") },
+    { id: "m6", tab: "oneview", label: "One View: 🔀 channel-failover alert → goodwill (Tier 1)", hint: "Watch One View: the channel-failover alert fires and goodwill is sent automatically (Tier 1)", match: isType("meera", "action_goodwill") },
+    { id: "m7", tab: "oneview", label: "👥 Simulate 40 users → 🐞 platform-bug alert → file incident (Tier 2)", hint: "Click ×40 users, then approve the engineering incident (Tier 2)", targets: ["tier2-approve", "cohort-btn"], match: (e) => e.type === "action_file_incident" },
   ],
   rohan: [
-    { id: "r1", tab: "app", label: "Log in → view statement (annual fee ₹4,999 posted)", match: isType("rohan", "statement_view") },
-    { id: "r2", tab: "call", label: "Call care — ask for fee waiver (denied)", match: isType("rohan", "call_start") },
-    { id: "r3", tab: "app", label: "Spend drops 52% over the month", match: isType("rohan", "spend_drop") },
-    { id: "r4", tab: "call", label: "💥 Second call — hints at cancellation", match: (e) => e.persona === "rohan" && e.type === "call_start" && !!e.detail?.includes("cancelling") },
-    { id: "r5", tab: "oneview", label: "One View: churn-risk alert → retention offer drafted (Tier 2)", match: isType("rohan", "action_retention_offer") },
+    { id: "r1", tab: "app", label: "Log in → view statement (annual fee ₹4,999 posted)", hint: "Open Statements — the annual fee just posted", targets: ["statement-card", "tab-statements"], match: isType("rohan", "statement_view") },
+    { id: "r2", tab: "call", label: "Call care — ask for fee waiver (denied)", hint: "Call to ask for a fee waiver", targets: ["call-launcher", "call-panel"], match: isType("rohan", "call_start") },
+    { id: "r3", tab: "app", label: "Spend drops 52% over the month", hint: "A month passes — simulate the spend drop", targets: ["spend-drop"], match: isType("rohan", "spend_drop") },
+    { id: "r4", tab: "call", label: "💥 Second call — hints at cancellation", hint: "Second call — he hints at cancelling", targets: ["call-launcher", "call-panel"], match: (e) => e.persona === "rohan" && e.type === "call_start" && !!e.detail?.includes("cancelling") },
+    { id: "r5", tab: "oneview", label: "One View: churn-risk alert → retention offer drafted (Tier 2)", hint: "Approve the retention offer in One View (Tier 2 — human in the loop)", targets: ["tier2-approve"], match: isType("rohan", "action_retention_offer") },
   ],
 };
 
