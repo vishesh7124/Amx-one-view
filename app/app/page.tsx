@@ -100,7 +100,7 @@ export default function AppMockup() {
   if (!loggedIn) {
     return (
       <main className="min-h-screen bg-amex-deep py-8 lg:pl-[340px]">
-        <DemoChrome current="app" />
+        {/* <DemoChrome current="app" /> */}
         <CallWidget />
         <PhoneFrame title="login">
           <div className="card-sheen px-6 pt-10 pb-16 text-white">

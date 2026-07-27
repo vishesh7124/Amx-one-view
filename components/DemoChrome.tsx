@@ -24,7 +24,7 @@ export default function DemoChrome({ current, bare }: { current: "web" | "app" |
   return (
     <>
       {/* top-right control bar */}
-      {!bare && (
+      {/* {!bare && (
       <div className="fixed top-3 right-3 z-50 flex items-center gap-2 bg-amex-deep/90 text-white rounded-full pl-3 pr-2 py-1.5 shadow-lg backdrop-blur text-xs">
         <span className="opacity-70 hidden sm:inline">🎬</span>
         <select
@@ -63,7 +63,7 @@ export default function DemoChrome({ current, bare }: { current: "web" | "app" |
           ↺
         </button>
       </div>
-      )}
+      )} */}
 
       {/* bottom-left script checklist */}
       <div className="fixed bottom-3 left-3 z-50 w-80 max-w-[85vw] bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden text-sm">
