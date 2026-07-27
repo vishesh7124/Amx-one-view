@@ -66,7 +66,7 @@ export default function DemoChrome({ current, bare }: { current: "web" | "app" |
       )} */}
 
       {/* bottom-left script checklist */}
-      <div className="fixed bottom-3 left-3 z-50 w-80 max-w-[85vw] bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden text-sm">
+      {/* <div className="fixed bottom-3 left-3 z-50 w-80 max-w-[85vw] bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden text-sm">
         <div className="flex items-center bg-amex-dark text-white text-xs font-semibold">
           <button onClick={() => setOpen(!open)} className="flex-1 text-left px-3 py-2">
             🎬 Script — {PERSONAS[persona].name} · {done}/{steps.length} steps
@@ -114,7 +114,7 @@ export default function DemoChrome({ current, bare }: { current: "web" | "app" |
             })}
           </ol>
         )}
-      </div>
+      </div> */}
 
       {/* guided tour overlay (spotlight + auto-advance) */}
       <TourGuide current={current} />
