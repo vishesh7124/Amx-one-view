@@ -95,7 +95,7 @@ export default function TourGuide({ current }: { current: string }) {
   }
 
   // ─── step lives on another tab ───
-  if (step.tab !== current) {
+  if (step.tab !== current && step.tab!== "call") {
     return (
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[75] w-[360px] max-w-[92vw] bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 pop-in">
         {cardBody(step.hint)}
